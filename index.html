@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>reveal.js</title>
+
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/reveal.css">
+  <link rel="stylesheet" href="css/theme/moon.css">
+
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="lib/css/atom-one-dark.css">
+
+
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
+
+  </script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- Heading section -->
+      <section data-markdown>
+        <textarea data-template>
+            ## ZIO-Config
+            ### Quick updates
+	      </textarea>
+      </section>
+
+
+      <section data-transition="fade-out">
+        <h3>ZIO-Config 2.0 & 3.0</h3>
+
+        <p style="font-size:40px"> zio-config-2.x marks the next major release, based on user feedback</span>
+        </p>
+        <p style="font-size:40px"> zio-config-3.x makes zio-config-2.x work with zio-2.x</span></p>
+
+        <p style="font-size:40px"> Both works with scala3 as well </span></p>
+      </section>
+
+
+      <section data-transition="fade-out">
+        <h3>On a high level</h3>
+
+        <p style="font-size:35px;text-align: left;"><span>More composable than zio-1.x</span></p>
+        <p style="font-size:35px;text-align: left;"><span>More ergonomic than zio-1.x</span></p>
+        <p style="font-size:35px;text-align: left;"><span>Real life ConfigSource</span></p>
+        <p style="font-size:35px;text-align: left;"><span>More integrations with outside world</span></p>
+        <p style="font-size:35px;text-align: left;"><span>And plus more features</span></p>
+      </section>
+
+
+      <!-- Slide 2 -->
+      <section data-transition="fade-out">
+        <h3>Ergonomic - No more apply, unapply and |@|</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+
+         // Before
+         val config: ConfigDescroptor[MyConfig] = 
+           (int("AGE") |@| (string("NAME"))(MyConfig.apply, MyConfig.unapply)
+
+         // After
+          int("AGE").zip(string("NAME").to[MyConfig]
+
+        </code></pre>
+      </section>
+
+      <!-- Slide 2 -->
+      <section data-transition="fade-out">
+        <h3>No more tupled </h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+
+         // Before
+         val config: ConfigDescroptor[(Int, String, Double)] = 
+           (int("AGE") |@| (string("NAME") |@| double("amount")).tupled
+
+         // After
+         val config: ConfigDescroptor[(Int, String, Double)] = 
+           int("AGE") zip string("NAME") zip double("amount")
+          
+        </code></pre>
+      </section>
+
+      <!-- Slide 2 -->
+      <section data-transition="fade-out">
+        <h3>Composability - Before</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+
+          // Before
+          val mapSource: ConfigSource[String, String] = 
+            ConfigSource.fromMap(Map("PORT" -> "9999"))
+
+          val hoconSource:  Task[ConfigSource[String, String]] = 
+            ConfigSource.fromHoconFile(new File("/abcd"))
+
+          // Doesn't compile
+          val configSource =
+            mapSource orElse hoconSource
+                
+         </code></pre>
+      </section>
+
+
+      <!-- Slide 2 -->
+      <section data-transition="fade-out">
+        <h3>Composability - Now</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+
+          val mapSource: ConfigSource = 
+            ConfigSource.fromMap(Map("PORT" -> "9999"))
+
+          val hoconSource: ConfigSource = 
+            ConfigSource.fromHoconFile(new File("/abcd"))
+
+          // Does compile
+          val configSource =
+            mapSource orElse hoconSource
+
+          read(int("PORT") from source)           
+         </code></pre>
+      </section>
+
+
+    </div>
+  </div>
+
+  <script src="js/reveal.js"></script>
+
+  <script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+      // ...
+
+      // The "normal" size of the presentation, aspect ratio will be preserved
+      // when the presentation is scaled to fit different resolutions. Can be
+      // specified using percentage units.
+      width: 1300,
+      height: 750,
+
+      // Factor of the display size that should remain empty around the content
+      margin: 0.1,
+
+      // Bounds for smallest/largest possible scale to apply to content
+      minScale: 0.2,
+      maxScale: 1.5,
+      history: true,
+      dependencies: [
+        { src: 'plugin/markdown/marked.js' },
+        { src: 'plugin/markdown/markdown.js' },
+        { src: 'plugin/notes/notes.js', async: true },
+        { src: 'plugin/highlight/highlight.js', async: true },
+        { src: 'https://d3js.org/d3.v4.min.js' },
+        { src: 'plugin/d3js/d3js.js' }
+      ]
+    });
+  </script>
+</body>
+
+</html>
