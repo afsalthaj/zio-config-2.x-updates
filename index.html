@@ -130,6 +130,189 @@
          </code></pre>
       </section>
 
+      <section data-transition="fade-out">
+        <h3>Read returns ZIO, and not Either - Now</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+
+          // read(config from source) returns a ZIO[Any, ReadError[String], Config] 
+          // instead of Either[ReadError[String], Config]
+
+          val app: ZIO[Any, ReadError[String], (Int, String)] =
+            read(int("age").zip(string("name")) from ConfigSource.fromMap(Map.empty))    
+            
+         // This also implies, 
+         // there isn't a need of doing ZIO.fromEither if you happen to use read in a ZIO context.
+   
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>ConfigSource, and resource management</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+
+          ConfigSource internals have been changed to support the fact that 
+          forming a ConfigSource involves an managed effect.
+        
+   
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>ConfigSource, is a Reader</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+           type TreeReader           = PropertyTreePath[K] => ZIO[Any, ReadError[K], PropertyTree[K, V]]
+
+           // A reader can be initialised under a managed effect
+           type MemoizableManaged[A] = ZManaged[Any, Nothing, ZManaged[Any, ReadError[K], A]]
+
+           // The managed effect can be memoized
+           type MemoizableManagedReader = MemoizableManaged[TreeReader]
+
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>ConfigSource, is a memoized Reader</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+          Most of the inbuilt sources as of now are memoized.
+          This implies, if we have n number of keys to be read for each `read(desc)`,
+          all the n keys are read in a single resource lifecycle.
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>ConfigSource, can be anything</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+          ConfigSource can be even more powerful, that you can make the resource lifecycle happen
+          per key
+
+         </code></pre>
+      </section>
+
+
+      <section data-transition="fade-out">
+        <h3>A complex Custom ConfigSource - a few helpers</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+          def getConnection(): ZManaged[Any, Throwable, Connection] = 
+            ZManaged.make(ZIO.debug("Acquire connection") *> acquireConnection )(connection =>  ZIO.debug("Release connection") *> ZIO.effect(connection.close))
+         
+          def readDb(connection: Connection, key: PropertyTreePath[String]): ZIO[Any, Throwable, PropertyTree[String, String]] = ???  
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>A complex Custom ConfigSource</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+         val reader: ZManaged[Any, ReadError[String], TreeReader] =
+            getConnection
+              .map(connection =>
+                (key: PropertyTreePath[String]) => readDb(connection, key)
+              )
+
+          val source: ConfigSource =
+            ConfigSource.fromManaged("my db source",  reader)   
+            
+          val app: ZIO[Any, ReadError[String], (Int, String)] =
+            read((int("age") zip string("name")) from source)  
+
+            // [info] Acquire connection
+            // [info] Release connection
+            // [info] Acquire connection
+            // [info] Release connection
+
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>A complex Custom ConfigSource</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+    
+          val app: ZIO[Any, ReadError[String], (Int, String)] =
+          read((int("age") zip string("name")) from source.memoize)
+          
+        // [info] Acquire connection
+        // [info] Release connection
+        // [info] (1,afsal)
+
+         </code></pre>
+      </section>
+
+
+
+      <section data-transition="fade-out">
+        <h3>ConfigSource initialisation per read and multiple reads</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+    
+          There is a second level of memoization (logically) where config-source can be initialised once and for all, 
+          and is reused across the app in multiple reads. 
+
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>ConfigSource initialisation per read and multiple reads</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+    
+          // Default behaviour
+          val source =
+            ConfigSource.fromHoconFilePath("/Users/afsalthaj/sample.txt")
+      
+      
+        // It will read the actual file twice.
+        val app: ZIO[Any, ReadError[String], (Int, String)] =
+          for {
+            age  <- read(int("age") from source)
+            name <- read(string("name") from source)
+          } yield (age, name)
+
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>ConfigSource initialisation per read and multiple reads</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+        
+        val source =
+          ConfigSource.fromHoconFilePath("/Users/afsalthaj/sample.txt")
+      
+        val app: ZIO[Any, ReadError[String], (Int, String)] =
+          for {
+            src  <- source.strictlyOnce
+            age  <- read(int("age") from src)
+            name <- read(string("name") from src)
+          } yield (age, name)
+
+         </code></pre>
+      </section>
+
+
+      <section data-transition="fade-out">
+        <h3>zio-config-aws</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+        
+        // zio-config-aws
+        // Example: Recursively read SSM parameter-store path
+        val source = 
+          ConfigSource.fromParameterStore(
+            basePath,
+            Task(AWSSimpleSystemsManagementClientBuilder.defaultClient())
+          )
+
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>And other integrations</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+        
+        Integrations with 
+          cats (typeclasses and data)
+          scalaz (typeclasses and data)
+          enumeratum
+          
+      // Example: Now on, you can read cat's NonEmptyList from any source.
+         </code></pre>
+      </section>
 
     </div>
   </div>
