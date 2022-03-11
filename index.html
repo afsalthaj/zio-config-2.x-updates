@@ -231,7 +231,7 @@
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
     
           val app: ZIO[Any, ReadError[String], (Int, String)] =
-          read((int("age") zip string("name")) from source.memoize)
+           read((int("age") zip string("name")) from source.memoize)
           
         // [info] Acquire connection
         // [info] Release connection
@@ -393,6 +393,23 @@
          </code></pre>
       </section>
 
+      <section data-transition="fade-out">
+        <h3>With more consistency</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+          
+         // TypsafeConfigSource.fromHoconFile("...")
+         // is now
+         import zio.config.typesafe._
+         ConfigSource.fromHoconFile(..)
+        
+         </code></pre>
+      </section>
+
+
+      <section data-transition="fade-out">
+        <h3>Thank you</h3>
+
+      </section>
 
     </div>
   </div>
