@@ -9,7 +9,7 @@
 
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/reveal.css">
-  <link rel="stylesheet" href="css/theme/moon.css">
+  <link rel="stylesheet" href="css/theme/league.css">
 
   <!-- Theme used for syntax highlighting of code -->
   <link rel="stylesheet" href="lib/css/atom-one-dark.css">
@@ -41,11 +41,13 @@
       <section data-transition="fade-out">
         <h3>ZIO-Config 2.0 & 3.0</h3>
 
-        <p style="font-size:40px"> zio-config-2.x marks the next major release, based on user feedback</span>
+        <p style="font-size:40px"> <span style="color: red;">zio-config-2.x</span> is the new major release</span>
         </p>
-        <p style="font-size:40px"> zio-config-3.x makes zio-config-2.x work with zio-2.x</span></p>
+        <p style="font-size:40px"> <span style="color: red;"> zio-config-3.x</span> makes it work with <span
+            style="color: red;">zio-2.x</span>
+        </p>
 
-        <p style="font-size:40px"> Both works with scala3 as well </span></p>
+        <p style="font-size:30px"> Scala: 2.x & 3.x </span></p>
       </section>
 
 
@@ -310,18 +312,20 @@
         <h3>And other integrations</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
         
-        Integrations with 
-          cats (typeclasses and data)
-          scalaz (typeclasses and data)
-          enumeratum
+      - cats (typeclasses and data)
+
+      - scalaz (typeclasses and data)
+
+      - enumeratum
+
+      - pureconfig
           
-      // Example: Now on, you can read cat's NonEmptyList from any source.
          </code></pre>
       </section>
 
 
       <section data-transition="fade-out">
-        <h3>Example</h3>
+        <h3>Example: WITH CATS</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
         
 
@@ -348,7 +352,7 @@
 
 
       <section data-transition="fade-out">
-        <h3>Peek into a source</h3>
+        <h3>With more features: Peek into a source</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
           
           
@@ -378,7 +382,6 @@
         <h3>Peek into a source</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
           
-          
          
          final case class ShortConfig(x: Int, y: Int)
 
@@ -394,13 +397,14 @@
       </section>
 
       <section data-transition="fade-out">
-        <h3>With more consistency</h3>
+        <h3>All with more consistency</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
           
-         // TypsafeConfigSource.fromHoconFile("...")
-         // is now
-         import zio.config.typesafe._
-         ConfigSource.fromHoconFile(..)
+         import zio.config._, typesafe._, yaml._
+
+         ConfigSource.fromMap(..)        // zio-config
+         ConfigSource.fromHoconFile(..)  // zio-config-typesafe
+         ConfigSource.fromYamlFile(..)   // zio-config-yaml
         
          </code></pre>
       </section>
