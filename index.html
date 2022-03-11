@@ -137,12 +137,9 @@
           // read(config from source) returns a ZIO[Any, ReadError[String], Config] 
           // instead of Either[ReadError[String], Config]
 
-          val app: ZIO[Any, ReadError[String], (Int, String)] =
-            read(int("age").zip(string("name")) from ConfigSource.fromMap(Map.empty))    
-            
-         // This also implies, 
-         // there isn't a need of doing ZIO.fromEither if you happen to use read in a ZIO context.
-   
+          val app: ZIO[Any, ReadError[String], AppConfig] =
+            read(config from source)    
+          
          </code></pre>
       </section>
 
@@ -160,10 +157,10 @@
       <section data-transition="fade-out">
         <h3>ConfigSource, is a Reader</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
-           type TreeReader           = PropertyTreePath[K] => ZIO[Any, ReadError[K], PropertyTree[K, V]]
+           type TreeReader = PropertyTreePath[K] => ZIO[Any, ReadError[K], PropertyTree[K, V]]
 
            // A reader can be initialised under a managed effect
-           type MemoizableManaged[A] = ZManaged[Any, Nothing, ZManaged[Any, ReadError[K], A]]
+           type MemoizableManaged[A] = ZManaged ....
 
            // The managed effect can be memoized
            type MemoizableManagedReader = MemoizableManaged[TreeReader]
@@ -173,10 +170,10 @@
 
       <section data-transition="fade-out">
         <h3>ConfigSource, is a memoized Reader</h3>
-        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+        <pre><code class="hljs python" style="font-size:20px;" data-trim data-trim>
           Most of the inbuilt sources as of now are memoized.
-          This implies, if we have n number of keys to be read for each `read(desc)`,
-          all the n keys are read in a single resource lifecycle.
+          This implies, if we have n number of keys to be read in `read(config source)`,
+          then all the n keys are read in a single resource lifecycle.
          </code></pre>
       </section>
 
