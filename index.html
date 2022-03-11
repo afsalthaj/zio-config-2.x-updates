@@ -301,6 +301,7 @@
          </code></pre>
       </section>
 
+
       <section data-transition="fade-out">
         <h3>And other integrations</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
@@ -311,6 +312,33 @@
           enumeratum
           
       // Example: Now on, you can read cat's NonEmptyList from any source.
+         </code></pre>
+      </section>
+
+
+      <section data-transition="fade-out">
+        <h3>Example</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+        
+
+  final case class Database(url: String, port: Int)
+
+  object Database {
+    val config = string("URL").zip(int("PORT")).to[Database]
+  }
+
+         </code></pre>
+      </section>
+
+      <section data-transition="fade-out">
+        <h3>Example: with cats</h3>
+        <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
+          // And a reminder of how to compose your config in your app with zio-config
+         val result: IO[ReadError[String], NonEmptyList[Database]] = 
+           read(nonEmptyList("databases")(Database.config) from source)
+
+         // reading
+         //  { databases: [ {url : "x", port : 1}, {url : "y", port : 2} ]  
          </code></pre>
       </section>
 
