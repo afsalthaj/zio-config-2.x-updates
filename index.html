@@ -172,17 +172,18 @@
         <h3>ConfigSource, is a memoized Reader</h3>
         <pre><code class="hljs python" style="font-size:20px;" data-trim data-trim>
           Most of the inbuilt sources as of now are memoized.
-          This implies, if we have n number of keys to be read in `read(config source)`,
-          then all the n keys are read in a single resource lifecycle.
+
+          This implies; 
+            if we have n number of keys to be read in `read(config source)`,
+            then all the n keys are read in a single resource lifecycle.
          </code></pre>
       </section>
 
       <section data-transition="fade-out">
         <h3>ConfigSource, can be anything</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
-          ConfigSource can be even more powerful, that you can make the resource lifecycle happen
-          per key
-
+          ConfigSource can be even more powerful, 
+          that you can make the resource lifecycle happen per key
          </code></pre>
       </section>
 
@@ -191,9 +192,14 @@
         <h3>A complex Custom ConfigSource - a few helpers</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
           def getConnection(): ZManaged[Any, Throwable, Connection] = 
-            ZManaged.make(ZIO.debug("Acquire connection") *> acquireConnection )(connection =>  ZIO.debug("Release connection") *> ZIO.effect(connection.close))
+            ZManaged.make(ZIO.debug("Acquire connection") *> acquireConnection )(
+              connection =>  ZIO.debug("Release connection") *> ZIO.effect(connection.close)
+            )
          
-          def readDb(connection: Connection, key: PropertyTreePath[String]): ZIO[Any, Throwable, PropertyTree[String, String]] = ???  
+          def readDb(
+            connection: Connection, 
+            key: PropertyTreePath[String]
+          ): ZIO[Any, Throwable, PropertyTree[String, String]] = ???  
          </code></pre>
       </section>
 
@@ -229,7 +235,7 @@
           
         // [info] Acquire connection
         // [info] Release connection
-        // [info] (1,afsal)
+        // [info] (1, jon)
 
          </code></pre>
       </section>
@@ -240,8 +246,9 @@
         <h3>ConfigSource initialisation per read and multiple reads</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
     
-          There is a second level of memoization (logically) where config-source can be initialised once and for all, 
-          and is reused across the app in multiple reads. 
+          There is a second level of memoization (logically);
+            where config-source can be initialised once and for all, 
+            and is reused across the app in multiple reads. 
 
          </code></pre>
       </section>
