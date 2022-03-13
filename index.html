@@ -54,8 +54,8 @@
       <section data-transition="fade-out">
         <h3>On a high level</h3>
 
-        <p style="font-size:35px;text-align: left;"><span>More composable than zio-1.x</span></p>
-        <p style="font-size:35px;text-align: left;"><span>More ergonomic than zio-1.x</span></p>
+        <p style="font-size:35px;text-align: left;"><span>More composable than zio-config-1.x</span></p>
+        <p style="font-size:35px;text-align: left;"><span>More ergonomic than zio-config-1.x</span></p>
         <p style="font-size:35px;text-align: left;"><span>Real life ConfigSource</span></p>
         <p style="font-size:35px;text-align: left;"><span>More integrations with outside world</span></p>
         <p style="font-size:35px;text-align: left;"><span>And plus more features</span></p>
@@ -185,13 +185,13 @@
         <h3>ConfigSource, can be anything</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
           ConfigSource can be even more powerful, 
-          that you can make the resource lifecycle happen per key
+          that you can have resource lifecycle per key
          </code></pre>
       </section>
 
 
       <section data-transition="fade-out">
-        <h3>A complex Custom ConfigSource - a few helpers</h3>
+        <h3>Example: A complex Custom ConfigSource</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
           def getConnection(): ZManaged[Any, Throwable, Connection] = 
             ZManaged.make(ZIO.debug("Acquire connection") *> acquireConnection )(
@@ -206,7 +206,7 @@
       </section>
 
       <section data-transition="fade-out">
-        <h3>A complex Custom ConfigSource</h3>
+        <h3>Example: A complex Custom ConfigSource</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
          val reader: ZManaged[Any, ReadError[String], TreeReader] =
             getConnection
@@ -229,7 +229,7 @@
       </section>
 
       <section data-transition="fade-out">
-        <h3>A complex Custom ConfigSource</h3>
+        <h3>Example: A complex Custom ConfigSource - memoized</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
     
           val app: ZIO[Any, ReadError[String], (Int, String)] =
@@ -245,7 +245,7 @@
 
 
       <section data-transition="fade-out">
-        <h3>ConfigSource initialisation per read and multiple reads</h3>
+        <h3>A second level memoization</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
     
           There is a second level of memoization (logically);
@@ -256,7 +256,7 @@
       </section>
 
       <section data-transition="fade-out">
-        <h3>ConfigSource initialisation per read and multiple reads</h3>
+        <h3>A second level memoization</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
     
           // Default behaviour
@@ -275,7 +275,7 @@
       </section>
 
       <section data-transition="fade-out">
-        <h3>ConfigSource initialisation per read and multiple reads</h3>
+        <h3>A second level memoization</h3>
         <pre><code class="hljs scala" style="font-size:20px;" data-trim data-trim>
         
         val source =
